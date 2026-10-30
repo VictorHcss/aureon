@@ -1,0 +1,271 @@
+@import "tailwindcss";
+
+/*
+  Aureon — tokens visuais.
+
+  Grafite + dourado. O dourado (--accent) é usado com parcimônia: botão principal,
+  item ativo do menu e foco. Para TEXTO dourado em fundo claro, use --link, que é
+  um tom mais escuro com contraste suficiente (o #F59E0B puro sobre branco não passa
+  no WCAG AA).
+
+  Verde = preço caiu (bom para quem compra); vermelho = preço subiu ou erro.
+  Os nomes "down"/"up" foram mantidos de propósito: são usados em todo o painel.
+
+  Tema: o atributo data-theme no <html> vem do cookie "aureon-theme"
+  (light | dark | system). Em "system" vale a preferência do sistema operacional.
+*/
+:root {
+  --paper: #f6f7f9;
+  --surface: #ffffff;
+  --sunken: #eff1f4;
+  --ink: #202329;
+  --muted: #646b76;
+  --line: #e1e4e9;
+  --line-strong: #cdd2d9;
+  --accent: #f59e0b;
+  --accent-ink: #15171b;
+  --accent-soft: #fdf3dc;
+  --link: #a35a00;
+  --down: #147537;
+  --down-bg: #e7f6ec;
+  --up: #b91c1c;
+  --up-bg: #fdecec;
+  --warn: #8a4b06;
+  --warn-bg: #fdf1dc;
+  /* Menu lateral: grafite nos dois temas, é a assinatura visual da marca. */
+  --rail: #15171b;
+  --rail-raised: #202329;
+  --rail-ink: #eceef1;
+  --rail-muted: #9aa1ac;
+  --rail-line: #2a2e35;
+  --shadow: 0 1px 2px rgb(21 23 27 / 0.05), 0 1px 1px rgb(21 23 27 / 0.03);
+  --shadow-pop: 0 12px 32px rgb(21 23 27 / 0.18);
+  --chart-1: #d98200;
+  --chart-2: #2563eb;
+  --chart-3: #7c3aed;
+  --chart-4: #0f766e;
+  --chart-5: #be185d;
+  --chart-6: #4d7c0f;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #15171b;
+    --surface: #202329;
+    --sunken: #1a1c21;
+    --ink: #eceef1;
+    --muted: #9ca3ae;
+    --line: #2e323a;
+    --line-strong: #3b4049;
+    --accent: #f59e0b;
+    --accent-ink: #15171b;
+    --accent-soft: #3a2d12;
+    --link: #fbbf24;
+    --down: #4ade80;
+    --down-bg: #13301e;
+    --up: #f87171;
+    --up-bg: #3a1a1a;
+    --warn: #fbbf24;
+    --warn-bg: #3a2d12;
+    --rail: #101115;
+    --rail-raised: #1c1e23;
+    --rail-line: #24272d;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+    --shadow-pop: 0 12px 32px rgb(0 0 0 / 0.5);
+    --chart-1: #fbbf24;
+    --chart-2: #60a5fa;
+    --chart-3: #a78bfa;
+    --chart-4: #2dd4bf;
+    --chart-5: #f472b6;
+    --chart-6: #a3e635;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --paper: #15171b;
+  --surface: #202329;
+  --sunken: #1a1c21;
+  --ink: #eceef1;
+  --muted: #9ca3ae;
+  --line: #2e323a;
+  --line-strong: #3b4049;
+  --accent: #f59e0b;
+  --accent-ink: #15171b;
+  --accent-soft: #3a2d12;
+  --link: #fbbf24;
+  --down: #4ade80;
+  --down-bg: #13301e;
+  --up: #f87171;
+  --up-bg: #3a1a1a;
+  --warn: #fbbf24;
+  --warn-bg: #3a2d12;
+  --rail: #101115;
+  --rail-raised: #1c1e23;
+  --rail-line: #24272d;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-pop: 0 12px 32px rgb(0 0 0 / 0.5);
+  --chart-1: #fbbf24;
+  --chart-2: #60a5fa;
+  --chart-3: #a78bfa;
+  --chart-4: #2dd4bf;
+  --chart-5: #f472b6;
+  --chart-6: #a3e635;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-sunken: var(--sunken);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-link: var(--link);
+  --color-down: var(--down);
+  --color-down-bg: var(--down-bg);
+  --color-up: var(--up);
+  --color-up-bg: var(--up-bg);
+  --color-warn: var(--warn);
+  --color-warn-bg: var(--warn-bg);
+  --color-rail: var(--rail);
+  --color-rail-raised: var(--rail-raised);
+  --color-rail-ink: var(--rail-ink);
+  --color-rail-muted: var(--rail-muted);
+  --color-rail-line: var(--rail-line);
+  --shadow-card: var(--shadow);
+  --shadow-pop: var(--shadow-pop);
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --animate-enter: enter 220ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-drawer: drawer 200ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-pop: pop 160ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+
+  @keyframes enter {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes drawer {
+    from { transform: translateX(-100%); }
+    to { transform: none; }
+  }
+  @keyframes pop {
+    from { opacity: 0; transform: scale(0.97); }
+    to { opacity: 1; transform: none; }
+  }
+}
+
+html {
+  background: var(--paper);
+  color: var(--ink);
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+/* Ativado por alguns instantes ao trocar de tema, para a troca não ser brusca. */
+html.theme-transition,
+html.theme-transition *,
+html.theme-transition *::before {
+  transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease !important;
+}
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+::selection {
+  background: var(--accent-soft);
+}
+/* Números tabulares: valores em coluna ficam alinhados. */
+.figure {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+input,
+select,
+textarea {
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  padding: 0.55rem 0.7rem;
+  width: 100%;
+  min-height: 2.5rem;
+  color: var(--ink);
+  /* 16px evita o zoom automático do iOS ao focar o campo. */
+  font-size: 1rem;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+@media (min-width: 640px) {
+  input,
+  select,
+  textarea {
+    font-size: 0.9rem;
+  }
+}
+input:hover,
+select:hover,
+textarea:hover {
+  border-color: var(--muted);
+}
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+input[type="checkbox"] {
+  width: 1.1rem;
+  height: 1.1rem;
+  min-height: 0;
+  padding: 0;
+  accent-color: var(--accent);
+  flex-shrink: 0;
+}
+label > span.lbl {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 0.3rem;
+}
+
+dialog {
+  color: var(--ink);
+  max-height: calc(100dvh - 2rem);
+}
+dialog[open] {
+  animation: var(--animate-pop);
+}
+dialog::backdrop {
+  background: rgb(10 11 13 / 0.5);
+}
+dialog.drawer {
+  margin: 0;
+  height: 100dvh;
+  max-height: 100dvh;
+  width: min(18rem, 85vw);
+  max-width: none;
+}
+dialog.drawer[open] {
+  animation: var(--animate-drawer);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

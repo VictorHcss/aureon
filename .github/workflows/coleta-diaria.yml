@@ -1,0 +1,101 @@
+name: Coleta diária
+
+# 08:00 em Brasília = 11:00 UTC (o Brasil não tem horário de verão desde 2019).
+# O GitHub pode atrasar o início de agendamentos em alguns minutos (às vezes mais em horários de pico).
+on:
+  schedule:
+    - cron: "0 11 * * *"
+  workflow_dispatch:
+    inputs:
+      modo:
+        description: "O que executar"
+        type: choice
+        default: completo
+        options:
+          - completo
+          - so-coleta
+          - so-alertas-e-relatorio
+          - teste-de-notificacao
+      forcar:
+        description: "Ignorar a trava diária (permite repetir a coleta e reenviar o relatório)"
+        type: boolean
+        default: false
+      simulacao:
+        description: "Simulação: coleta e grava, mas não envia mensagens"
+        type: boolean
+        default: false
+
+# Uma execução por vez; uma nova espera a anterior terminar (não cancela no meio).
+concurrency:
+  group: coleta-diaria
+  cancel-in-progress: false
+
+# Permissões mínimas: o workflow só precisa ler o código.
+permissions:
+  contents: read
+
+jobs:
+  coletar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      TZ: America/Sao_Paulo
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      ML_CLIENT_ID: ${{ secrets.ML_CLIENT_ID }}
+      ML_CLIENT_SECRET: ${{ secrets.ML_CLIENT_SECRET }}
+      ML_REDIRECT_URI: ${{ secrets.ML_REDIRECT_URI }}
+      ML_REFRESH_TOKEN: ${{ secrets.ML_REFRESH_TOKEN }}
+      ML_ZIP_CODE: ${{ vars.ML_ZIP_CODE }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      EMAIL_FROM: ${{ vars.EMAIL_FROM }}
+      REPORT_EMAIL_TO: ${{ vars.REPORT_EMAIL_TO }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ vars.TELEGRAM_CHAT_ID }}
+      WHATSAPP_TOKEN: ${{ secrets.WHATSAPP_TOKEN }}
+      WHATSAPP_PHONE_NUMBER_ID: ${{ secrets.WHATSAPP_PHONE_NUMBER_ID }}
+      WHATSAPP_TO: ${{ vars.WHATSAPP_TO }}
+      WHATSAPP_TEMPLATE_NAME: ${{ vars.WHATSAPP_TEMPLATE_NAME }}
+      WHATSAPP_TEMPLATE_LANG: ${{ vars.WHATSAPP_TEMPLATE_LANG }}
+      WHATSAPP_API_VERSION: ${{ vars.WHATSAPP_API_VERSION }}
+      APP_BASE_URL: ${{ vars.APP_BASE_URL }}
+      FAIL_ON_PARTIAL: ${{ vars.FAIL_ON_PARTIAL }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci --no-audit --no-fund
+
+      - name: Verificar segredos obrigatórios
+        run: |
+          missing=""
+          for v in SUPABASE_URL SUPABASE_SERVICE_ROLE_KEY; do
+            [ -z "${!v}" ] && missing="$missing $v"
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::Segredos ausentes:$missing. Configure em Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+
+      - name: Executar
+        env:
+          MODO: ${{ github.event_name == 'schedule' && 'completo' || inputs.modo }}
+          FORCAR: ${{ inputs.forcar && '--force' || '' }}
+          SIMULACAO: ${{ inputs.simulacao && '--dry-run' || '' }}
+          TRIGGER: ${{ github.event_name == 'schedule' && 'schedule' || 'manual' }}
+        run: |
+          case "$MODO" in
+            completo) ARGS="" ;;
+            so-coleta) ARGS="--skip-alerts --skip-report" ;;
+            so-alertas-e-relatorio) ARGS="--skip-collect" ;;
+            teste-de-notificacao) ARGS="--test-notify" ;;
+            *) echo "::error::Modo desconhecido: $MODO"; exit 1 ;;
+          esac
+          npx tsx scripts/daily.ts --trigger=$TRIGGER $ARGS $FORCAR $SIMULACAO
