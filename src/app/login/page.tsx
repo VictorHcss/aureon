@@ -42,7 +42,7 @@ export default async function LoginPage() {
             <span className="text-lg font-semibold tracking-tight">{BRAND.name}</span>
           </div>
           <h1 className="text-2xl font-semibold tracking-tight">Entrar no painel</h1>
-          <p className="mt-1.5 mb-7 text-sm text-muted">Use a senha definida na variável ADMIN_PASSWORD.</p>
+          <p className="mt-1.5 mb-7 text-sm text-muted">Use a senha definida.</p>
           <LoginForm />
         </div>
       </section>
